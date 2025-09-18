@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  memories    Memory[]
+  sessions    Session[]
+
+  @@map("agents")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  agentId   String
+  name      String?
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  metadata  Json?
+
+  // Relations
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  memories  Memory[]
+
+  @@map("sessions")
+}
+
+model Memory {
+  id          String   @id @default(uuid())
+  agentId     String
+  sessionId   String?
+  content     String
+  type        MemoryType @default(EPISODIC)
+  importance  Float    @default(1.0)
+  accessCount Int      @default(0)
+  lastAccessed DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  metadata    Json?
+
+  // Vector embedding for semantic search (1536 dimensions for OpenAI embeddings)
+  embedding   String?
+
+  // Relations
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  session     Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  
+  // Self-referential relationships for memory links
+  sourceLinks MemoryLink[] @relation("SourceMemory")
+  targetLinks MemoryLink[] @relation("TargetMemory")
+  
+  // Procedural memory steps
+  steps       ProceduralStep[]
+
+  @@map("memories")
+}
+
+model MemoryLink {
+  id            String   @id @default(uuid())
+  sourceId      String
+  targetId      String
+  linkType      LinkType @default(SEMANTIC)
+  strength      Float    @default(1.0)
+  similarity    Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  source        Memory   @relation("SourceMemory", fields: [sourceId], references: [id], onDelete: Cascade)
+  target        Memory   @relation("TargetMemory", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId, linkType])
+  @@map("memory_links")
+}
+
+model ProceduralStep {
+  id          String   @id @default(uuid())
+  memoryId    String
+  stepNumber  Int
+  action      String
+  parameters  Json?
+  result      String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  memory      Memory   @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+
+  @@unique([memoryId, stepNumber])
+  @@map("procedural_steps")
+}
+
+model MemoryAccess {
+  id        String   @id @default(uuid())
+  memoryId  String
+  agentId   String
+  accessType AccessType
+  timestamp DateTime @default(now())
+  metadata  Json?
+
+  @@map("memory_accesses")
+}
+
+model SystemMetrics {
+  id          String   @id @default(uuid())
+  metricType  String
+  value       Float
+  timestamp   DateTime @default(now())
+  metadata    Json?
+
+  @@map("system_metrics")
+}
+
+enum MemoryType {
+  EPISODIC
+  SEMANTIC
+  PROCEDURAL
+  WORKING
+  ARCHIVED
+}
+
+enum LinkType {
+  SEMANTIC
+  TEMPORAL
+  CAUSAL
+  CONTEXTUAL
+  HIERARCHICAL
+}
+
+enum AccessType {
+  READ
+  WRITE
+  UPDATE
+  DELETE
+  SEARCH
+}
