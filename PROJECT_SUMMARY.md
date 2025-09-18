@@ -190,7 +190,7 @@ totem-assignment/
 
 1. **Clone and Setup**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Ashishjagrawal/totem-assignment.git
    cd totem-assignment
    npm install
    ```

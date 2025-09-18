@@ -114,7 +114,7 @@ totem-assignment/
 
 ### **1. Clone and Setup**
 ```bash
-git clone <repository-url>
+git clone https://github.com/Ashishjagrawal/totem-assignment.git
 cd totem-assignment
 npm install
 cp env.example .env
@@ -191,7 +191,7 @@ npm run test:report       # Generate test reports
 
 ## 📞 **Submission Information**
 
-**Repository URL:** `<your-github-repo-url>`
+**Repository URL:** `https://github.com/Ashishjagrawal/totem-assignment`
 
 **Email Recipients:**
 - career@toteminteractive.in
