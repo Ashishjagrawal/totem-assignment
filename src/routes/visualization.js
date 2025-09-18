@@ -226,6 +226,7 @@ router.get('/clusters', async (req, res) => {
       success: true,
       data: {
         memories: projectedMemories,
+        clusters: projectedMemories,
         count: projectedMemories.length,
         timestamp: new Date(),
       },
@@ -307,10 +308,22 @@ router.get('/heatmap', async (req, res) => {
       });
     });
 
+    // Convert heatmap object to array format for frontend
+    const heatmapArray = [];
+    Object.keys(heatmap).forEach(day => {
+      Object.keys(heatmap[day]).forEach(hour => {
+        heatmapArray.push({
+          day,
+          hour: parseInt(hour),
+          ...heatmap[day][hour]
+        });
+      });
+    });
+
     res.json({
       success: true,
       data: {
-        heatmap,
+        heatmap: heatmapArray,
         period: `${days} days`,
         totalMemories: memories.length,
         timestamp: new Date(),

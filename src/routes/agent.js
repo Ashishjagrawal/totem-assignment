@@ -12,6 +12,7 @@ const agentService = new AgentService();
 const createAgentSchema = Joi.object({
   name: Joi.string().min(1).max(100).required(),
   description: Joi.string().max(500).optional(),
+  metadata: Joi.object().optional(),
 });
 
 const updateAgentSchema = Joi.object({

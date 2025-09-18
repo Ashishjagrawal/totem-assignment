@@ -5,6 +5,9 @@ process.env.TEST_DATABASE_URL = process.env.TEST_DATABASE_URL || process.env.DAT
 // Set a mock OpenAI API key for tests
 process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-api-key';
 
+// Use different ports for different test suites to avoid conflicts
+process.env.PORT = process.env.PORT || (3000 + Math.floor(Math.random() * 1000));
+
 const { PrismaClient } = require('@prisma/client');
 
 // Setup test database

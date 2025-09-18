@@ -231,6 +231,7 @@ router.get('/clustering', async (req, res) => {
     res.json({
       success: true,
       data: {
+        memories: memories,
         clusters: memories,
         links,
         count: memories.length,
