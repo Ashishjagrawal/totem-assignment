@@ -10,21 +10,21 @@ const router = express.Router();
 const createMemorySchema = Joi.object({
   agentId: Joi.string().uuid().required(),
   content: Joi.string().min(1).max(10000).required(),
-  type: Joi.string().valid('EPISODIC', 'SEMANTIC', 'PROCEDURAL', 'WORKING').default('EPISODIC'),
+  type: Joi.string().valid('EPISODIC', 'SEMANTIC', 'PROCEDURAL', 'WORKING', 'ARCHIVED').default('EPISODIC'),
   sessionId: Joi.string().uuid().optional(),
   metadata: Joi.object().optional(),
 });
 
 const updateMemorySchema = Joi.object({
   content: Joi.string().min(1).max(10000).optional(),
-  type: Joi.string().valid('EPISODIC', 'SEMANTIC', 'PROCEDURAL', 'WORKING').optional(),
+  type: Joi.string().valid('EPISODIC', 'SEMANTIC', 'PROCEDURAL', 'WORKING', 'ARCHIVED').optional(),
   importance: Joi.number().min(0).max(1).optional(),
   metadata: Joi.object().optional(),
 });
 
 const searchMemoriesSchema = Joi.object({
   query: Joi.string().min(1).max(1000).required(),
-  type: Joi.string().valid('EPISODIC', 'SEMANTIC', 'PROCEDURAL', 'WORKING').optional(),
+  type: Joi.string().valid('EPISODIC', 'SEMANTIC', 'PROCEDURAL', 'WORKING', 'ARCHIVED').optional(),
   limit: Joi.number().integer().min(1).max(100).default(10),
   offset: Joi.number().integer().min(0).default(0),
   minSimilarity: Joi.number().min(0).max(1).default(0.7),
@@ -166,6 +166,14 @@ router.post('/search', async (req, res) => {
   try {
     const { error, value } = searchMemoriesSchema.validate(req.body);
     if (error) {
+      // Check if agentId is missing
+      if (error.details.some(d => d.path.includes('agentId'))) {
+        return res.status(400).json({
+          success: false,
+          error: 'Agent ID is required for memory search',
+        });
+      }
+      
       return res.status(400).json({
         success: false,
         error: 'Validation error',

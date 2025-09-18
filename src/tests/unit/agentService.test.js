@@ -19,6 +19,22 @@ const mockPrisma = {
 
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn().mockImplementation(() => mockPrisma),
+  Prisma: {
+    MemoryType: {
+      EPISODIC: 'EPISODIC',
+      SEMANTIC: 'SEMANTIC',
+      PROCEDURAL: 'PROCEDURAL',
+      WORKING: 'WORKING',
+      ARCHIVED: 'ARCHIVED',
+    },
+    LinkType: {
+      SEMANTIC: 'SEMANTIC',
+      TEMPORAL: 'TEMPORAL',
+      CAUSAL: 'CAUSAL',
+      CONTEXTUAL: 'CONTEXTUAL',
+      HIERARCHICAL: 'HIERARCHICAL',
+    },
+  },
 }));
 
 describe('AgentService', () => {
@@ -88,11 +104,11 @@ describe('AgentService', () => {
         where: { id: agentId },
         include: {
           memories: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { startTime: 'desc' },
             take: 10,
           },
           sessions: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { startTime: 'desc' },
             take: 5,
           },
         },
@@ -125,7 +141,7 @@ describe('AgentService', () => {
       expect(mockPrisma.agent.findMany).toHaveBeenCalledWith({
         skip: 0,
         take: 10,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { startTime: 'desc' },
         include: {
           _count: {
             select: {

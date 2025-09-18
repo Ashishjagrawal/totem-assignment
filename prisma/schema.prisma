@@ -13,7 +13,9 @@ datasource db {
 model Agent {
   id          String   @id @default(uuid())
   name        String
+  type        String   @default("AI_AGENT")
   description String?
+  metadata    Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -25,12 +27,13 @@ model Agent {
 }
 
 model Session {
-  id        String   @id @default(uuid())
-  agentId   String
-  name      String?
-  startTime DateTime @default(now())
-  endTime   DateTime?
-  metadata  Json?
+  id          String   @id @default(uuid())
+  agentId     String
+  name        String?
+  description String?
+  startTime   DateTime @default(now())
+  endTime     DateTime?
+  metadata    Json?
 
   // Relations
   agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)

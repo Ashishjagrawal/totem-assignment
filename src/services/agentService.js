@@ -33,11 +33,11 @@ class AgentService {
         where: { id: agentId },
         include: {
           memories: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { startTime: 'desc' },
             take: 10,
           },
           sessions: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { startTime: 'desc' },
             take: 5,
           },
         },
@@ -97,7 +97,7 @@ class AgentService {
         this.prisma.agent.findMany({
           skip,
           take: limit,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { startTime: 'desc' },
           include: {
             _count: {
               select: {
@@ -151,7 +151,7 @@ class AgentService {
       const session = await this.prisma.session.update({
         where: { id: sessionId },
         data: {
-          endedAt: new Date(),
+          endTime: new Date(),
         },
       });
 
@@ -172,7 +172,7 @@ class AgentService {
           where: { agentId },
           skip,
           take: limit,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { startTime: 'desc' },
           include: {
             _count: {
               select: {

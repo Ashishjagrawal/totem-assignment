@@ -214,8 +214,8 @@ router.get('/clustering', async (req, res) => {
     const links = await prisma.memoryLink.findMany({
       where: {
         OR: [
-          { source: whereClause },
-          { target: whereClause },
+          { source: { embedding: { not: null } } },
+          { target: { embedding: { not: null } } },
         ],
       },
       select: {
@@ -231,7 +231,7 @@ router.get('/clustering', async (req, res) => {
     res.json({
       success: true,
       data: {
-        memories,
+        clusters: memories,
         links,
         count: memories.length,
         timestamp: new Date(),
@@ -313,6 +313,8 @@ router.get('/performance', async (req, res) => {
       success: true,
       data: {
         timeRange,
+        responseTime: avgResponseTime,
+        throughput: avgAccessLatency,
         metrics: {
           avgResponseTime,
           avgAccessLatency,

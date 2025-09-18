@@ -2,6 +2,9 @@
 process.env.NODE_ENV = 'test';
 process.env.TEST_DATABASE_URL = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL?.replace('memory_warehouse', 'memory_warehouse_test') || 'postgresql://postgres:postgres@localhost:5432/memory_warehouse_test?schema=public';
 
+// Set a mock OpenAI API key for tests
+process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-api-key';
+
 const { PrismaClient } = require('@prisma/client');
 
 // Setup test database

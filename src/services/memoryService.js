@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, Prisma } = require('@prisma/client');
 const EmbeddingService = require('./embeddingService');
 const logger = require('../utils/logger');
 

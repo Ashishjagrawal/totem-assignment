@@ -40,6 +40,22 @@ const mockPrisma = {
 
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn().mockImplementation(() => mockPrisma),
+  Prisma: {
+    MemoryType: {
+      EPISODIC: 'EPISODIC',
+      SEMANTIC: 'SEMANTIC',
+      PROCEDURAL: 'PROCEDURAL',
+      WORKING: 'WORKING',
+      ARCHIVED: 'ARCHIVED',
+    },
+    LinkType: {
+      SEMANTIC: 'SEMANTIC',
+      TEMPORAL: 'TEMPORAL',
+      CAUSAL: 'CAUSAL',
+      CONTEXTUAL: 'CONTEXTUAL',
+      HIERARCHICAL: 'HIERARCHICAL',
+    },
+  },
 }));
 
 describe('MemoryService', () => {
