@@ -138,7 +138,5 @@ dist/
 build/
 
 # Test files (exclude from production)
-tests/
-test-*.js
-*test*.js
+# Note: We keep src/tests/ for our unit and integration tests
 debug-*.js
