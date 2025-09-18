@@ -31,7 +31,13 @@ global.console = {
 
 module.exports = {
   testEnvironment: 'node',
-  testMatch: ['**/__tests__/**/*.test.js', '**/tests/**/*.test.js'],
+  testMatch: [
+    '**/__tests__/**/*.test.js',
+    '**/tests/**/*.test.js',
+    'src/tests/**/*.test.js',
+    'src/tests/unit/**/*.test.js',
+    '**/*.test.js'
+  ],
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/server.js',
@@ -48,4 +54,6 @@ module.exports = {
   testEnvironmentOptions: {
     NODE_ENV: 'test',
   },
+  // Add root directory to help Jest find files
+  rootDir: process.cwd(),
 };
