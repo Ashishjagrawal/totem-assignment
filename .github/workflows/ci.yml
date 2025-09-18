@@ -45,8 +45,10 @@ jobs:
 
     - name: Setup test database
       run: |
-        npx prisma migrate deploy
+        echo "Setting up test database..."
+        npx prisma db push --force-reset
         npx prisma generate
+        echo "Database setup complete"
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/memory_warehouse_test?schema=public
 
