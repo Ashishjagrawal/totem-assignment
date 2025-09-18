@@ -29,15 +29,19 @@ global.console = {
   fs.writeFileSync(setupFile, minimalSetup);
 }
 
+// Get absolute paths for better CI compatibility
+const rootDir = path.resolve(__dirname);
+const testMatch = [
+  path.join(rootDir, '**/__tests__/**/*.test.js'),
+  path.join(rootDir, '**/tests/**/*.test.js'),
+  path.join(rootDir, 'src/tests/**/*.test.js'),
+  path.join(rootDir, 'src/tests/unit/**/*.test.js'),
+  path.join(rootDir, '**/*.test.js')
+];
+
 module.exports = {
   testEnvironment: 'node',
-  testMatch: [
-    '**/__tests__/**/*.test.js',
-    '**/tests/**/*.test.js',
-    'src/tests/**/*.test.js',
-    'src/tests/unit/**/*.test.js',
-    '**/*.test.js'
-  ],
+  testMatch: testMatch,
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/server.js',
@@ -54,6 +58,6 @@ module.exports = {
   testEnvironmentOptions: {
     NODE_ENV: 'test',
   },
-  // Add root directory to help Jest find files
-  rootDir: process.cwd(),
+  // Use absolute path for root directory
+  rootDir: rootDir,
 };
