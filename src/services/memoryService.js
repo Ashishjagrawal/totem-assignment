@@ -1,10 +1,11 @@
 const { PrismaClient } = require('@prisma/client');
-const embeddingService = require('./embeddingService');
+const EmbeddingService = require('./embeddingService');
 const logger = require('../utils/logger');
 
 class MemoryService {
   constructor() {
     this.prisma = new PrismaClient();
+    this.embeddingService = new EmbeddingService();
     this.similarityThreshold = parseFloat(process.env.SIMILARITY_THRESHOLD) || 0.3;
     this.decayRate = parseFloat(process.env.MEMORY_DECAY_RATE) || 0.01;
   }
@@ -14,7 +15,7 @@ class MemoryService {
       const { content, type = 'EPISODIC', sessionId = null, metadata = {} } = memoryData;
 
       // Generate embedding for the content
-      const embedding = await embeddingService.generateEmbedding(content);
+      const embedding = await this.embeddingService.generateEmbedding(content);
 
       // Create the memory
       const memory = await this.prisma.memory.create({
@@ -91,7 +92,7 @@ class MemoryService {
       // Calculate similarities
       const similarities = memories.map(memory => ({
         ...memory,
-        similarity: embeddingService.calculateSimilarity(embedding, JSON.parse(memory.embedding || '[]')),
+        similarity: this.embeddingService.calculateSimilarity(embedding, JSON.parse(memory.embedding || '[]')),
       }));
 
       // Filter by threshold and sort by similarity
@@ -115,7 +116,7 @@ class MemoryService {
       } = options;
 
       // Generate embedding for the query
-      const queryEmbedding = await embeddingService.generateEmbedding(query);
+      const queryEmbedding = await this.embeddingService.generateEmbedding(query);
 
       // Find similar memories using vector similarity
       const similarMemories = await this.findSimilarMemories(queryEmbedding);
@@ -204,7 +205,7 @@ class MemoryService {
       // If content is being updated, regenerate embedding
       let embedding = null;
       if (content) {
-        embedding = await embeddingService.generateEmbedding(content);
+        embedding = await this.embeddingService.generateEmbedding(content);
       }
 
       const memory = await this.prisma.memory.update({
@@ -343,4 +344,4 @@ class MemoryService {
   }
 }
 
-module.exports = new MemoryService();
+module.exports = MemoryService;

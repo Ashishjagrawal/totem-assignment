@@ -98,4 +98,4 @@ class EmbeddingService {
   }
 }
 
-module.exports = new EmbeddingService();
+module.exports = EmbeddingService;

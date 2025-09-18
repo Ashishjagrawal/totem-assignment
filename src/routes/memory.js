@@ -1,6 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
-const memoryService = require('../services/memoryService');
+const MemoryService = require('../services/memoryService');
+const memoryService = new MemoryService();
 const logger = require('../utils/logger');
 
 const router = express.Router();

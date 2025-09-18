@@ -1,10 +1,12 @@
 const express = require('express');
 const Joi = require('joi');
 const { PrismaClient } = require('@prisma/client');
+const AgentService = require('../services/agentService');
 const logger = require('../utils/logger');
 
 const router = express.Router();
 const prisma = new PrismaClient();
+const agentService = new AgentService();
 
 // Validation schemas
 const createAgentSchema = Joi.object({
@@ -35,9 +37,7 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const agent = await prisma.agent.create({
-      data: value,
-    });
+    const agent = await agentService.createAgent(value);
     
     res.status(201).json({
       success: true,
@@ -67,35 +67,11 @@ router.get('/', async (req, res) => {
       ],
     } : {};
 
-    const [agents, total] = await Promise.all([
-      prisma.agent.findMany({
-        where: whereClause,
-        skip,
-        take: parseInt(limit),
-        orderBy: { createdAt: 'desc' },
-        include: {
-          _count: {
-            select: {
-              memories: true,
-              sessions: true,
-            },
-          },
-        },
-      }),
-      prisma.agent.count({ where: whereClause }),
-    ]);
+    const result = await agentService.listAgents(parseInt(page), parseInt(limit));
 
     res.json({
       success: true,
-      data: {
-        agents,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          pages: Math.ceil(total / parseInt(limit)),
-        },
-      },
+      data: result,
     });
   } catch (error) {
     logger.error('Error getting agents:', error);
@@ -119,38 +95,7 @@ router.get('/:id', async (req, res) => {
       });
     }
 
-    const agent = await prisma.agent.findUnique({
-      where: { id },
-      include: {
-        memories: {
-          take: 10,
-          orderBy: { createdAt: 'desc' },
-          select: {
-            id: true,
-            content: true,
-            type: true,
-            importance: true,
-            createdAt: true,
-          },
-        },
-        sessions: {
-          take: 5,
-          orderBy: { startTime: 'desc' },
-          select: {
-            id: true,
-            name: true,
-            startTime: true,
-            endTime: true,
-          },
-        },
-        _count: {
-          select: {
-            memories: true,
-            sessions: true,
-          },
-        },
-      },
-    });
+    const agent = await agentService.getAgent(id);
 
     if (!agent) {
       return res.status(404).json({
@@ -194,10 +139,7 @@ router.put('/:id', async (req, res) => {
       });
     }
 
-    const agent = await prisma.agent.update({
-      where: { id },
-      data: value,
-    });
+    const agent = await agentService.updateAgent(id, value);
     
     res.json({
       success: true,
@@ -233,9 +175,7 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    await prisma.agent.delete({
-      where: { id },
-    });
+    await agentService.deleteAgent(id);
     
     res.json({
       success: true,
@@ -282,9 +222,7 @@ router.post('/:id/sessions', async (req, res) => {
       });
     }
 
-    const session = await prisma.session.create({
-      data: value,
-    });
+    const session = await agentService.createSession(id, value);
     
     res.status(201).json({
       success: true,
@@ -315,34 +253,11 @@ router.get('/:id/sessions', async (req, res) => {
       });
     }
 
-    const [sessions, total] = await Promise.all([
-      prisma.session.findMany({
-        where: { agentId: id },
-        skip,
-        take: parseInt(limit),
-        orderBy: { startTime: 'desc' },
-        include: {
-          _count: {
-            select: {
-              memories: true,
-            },
-          },
-        },
-      }),
-      prisma.session.count({ where: { agentId: id } }),
-    ]);
+    const result = await agentService.getAgentSessions(id, parseInt(page), parseInt(limit));
 
     res.json({
       success: true,
-      data: {
-        sessions,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          pages: Math.ceil(total / parseInt(limit)),
-        },
-      },
+      data: result,
     });
   } catch (error) {
     logger.error('Error getting agent sessions:', error);
@@ -373,15 +288,7 @@ router.put('/:id/sessions/:sessionId/end', async (req, res) => {
       });
     }
 
-    const session = await prisma.session.update({
-      where: {
-        id: sessionId,
-        agentId: id,
-      },
-      data: {
-        endTime: new Date(),
-      },
-    });
+    const session = await agentService.endSession(sessionId);
     
     res.json({
       success: true,
