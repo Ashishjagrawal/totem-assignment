@@ -29,14 +29,13 @@ global.console = {
   fs.writeFileSync(setupFile, minimalSetup);
 }
 
-// Get absolute paths for better CI compatibility
-const rootDir = path.resolve(__dirname);
+// Use relative paths for Jest testMatch patterns
 const testMatch = [
-  path.join(rootDir, '**/__tests__/**/*.test.js'),
-  path.join(rootDir, '**/tests/**/*.test.js'),
-  path.join(rootDir, 'src/tests/**/*.test.js'),
-  path.join(rootDir, 'src/tests/unit/**/*.test.js'),
-  path.join(rootDir, '**/*.test.js')
+  '**/__tests__/**/*.test.js',
+  '**/tests/**/*.test.js',
+  'src/tests/**/*.test.js',
+  'src/tests/unit/**/*.test.js',
+  '**/*.test.js'
 ];
 
 module.exports = {
@@ -58,6 +57,6 @@ module.exports = {
   testEnvironmentOptions: {
     NODE_ENV: 'test',
   },
-  // Use absolute path for root directory
-  rootDir: rootDir,
+  // Use current directory as root
+  rootDir: process.cwd(),
 };
