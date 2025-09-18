@@ -14,4 +14,7 @@ module.exports = {
   transform: {},
   moduleFileExtensions: ['js', 'json'],
   testPathIgnorePatterns: ['/node_modules/', '/coverage/'],
+  testEnvironmentOptions: {
+    NODE_ENV: 'test',
+  },
 };
